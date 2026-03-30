@@ -11,24 +11,24 @@
 -- =============================================================================
 
 TRUNCATE TABLE
-    bronze.inventory_movements,
-    bronze.sales_order_lines,
-    bronze.sales_orders,
-    bronze.purchase_order_lines,
-    bronze.purchase_orders,
-    bronze.inventory,
-    bronze.product_suppliers,
-    bronze.customers,
-    bronze.products,
-    bronze.suppliers,
-    bronze.locations
+    silver.inventory_movements,
+    silver.sales_order_lines,
+    silver.sales_orders,
+    silver.purchase_order_lines,
+    silver.purchase_orders,
+    silver.inventory,
+    silver.product_suppliers,
+    silver.customers,
+    silver.products,
+    silver.suppliers,
+    silver.locations
 RESTART IDENTITY CASCADE;
 
 -- =============================================================================
 -- 1. LOCATIONS — 3 Sanicenters + 2 Regional Warehouses
 -- =============================================================================
 
-INSERT INTO bronze.locations (location_code, location_name, location_type, address, city, postal_code, region, storage_capacity_m3, is_active) VALUES
+INSERT INTO silver.locations (location_code, location_name, location_type, address, city, postal_code, region, storage_capacity_m3, is_active) VALUES
 ('LOC-BRU',  'Sanicenter Brussel',        'sanicenter',         'Chaussée de Louvain 412',   'Brussel',    '1030', 'Brussels',         850.00,  TRUE),
 ('LOC-ANT',  'Sanicenter Antwerpen',       'sanicenter',         'Turnhoutsebaan 298',        'Antwerpen',  '2140', 'Antwerp',          920.00,  TRUE),
 ('LOC-GNT',  'Sanicenter Gent',            'sanicenter',         'Brusselsesteenweg 558',     'Gent',       '9050', 'East Flanders',    780.00,  TRUE),
@@ -39,7 +39,7 @@ INSERT INTO bronze.locations (location_code, location_name, location_type, addre
 -- 2. SUPPLIERS — 10 European suppliers
 -- =============================================================================
 
-INSERT INTO bronze.suppliers (supplier_code, supplier_name, contact_name, email, country, avg_lead_time_days, reliability_score, is_active) VALUES
+INSERT INTO silver.suppliers (supplier_code, supplier_name, contact_name, email, country, avg_lead_time_days, reliability_score, is_active) VALUES
 ('SUP-001', 'Grohe AG',                  'Klaus Bauer',       'k.bauer@grohe.com',          'Germany',     5.0,  0.96, TRUE),
 ('SUP-002', 'Roca Sanitario SA',         'Carlos Mendez',     'c.mendez@roca.com',          'Spain',      12.0,  0.88, TRUE),
 ('SUP-003', 'Geberit AG',               'Hans Müller',       'h.mueller@geberit.com',       'Switzerland',  7.0,  0.97, TRUE),
@@ -55,7 +55,7 @@ INSERT INTO bronze.suppliers (supplier_code, supplier_name, contact_name, email,
 -- 3. PRODUCTS — 50 sanitary & building materials SKUs
 -- =============================================================================
 
-INSERT INTO bronze.products (sku, product_name, category, subcategory, brand, unit_of_measure, unit_weight_kg, unit_price_eur, lead_time_days, min_order_qty, is_active) VALUES
+INSERT INTO silver.products (sku, product_name, category, subcategory, brand, unit_of_measure, unit_weight_kg, unit_price_eur, lead_time_days, min_order_qty, is_active) VALUES
 -- Sanitair - Toiletten
 ('SKU-00001', 'Hangtoilet Rimless wit',                  'Sanitair',   'Toiletten',          'Duravit',  'stuk',  22.50,  389.00,  8, 1.00, TRUE),
 ('SKU-00002', 'Staand toilet compact 48cm',              'Sanitair',   'Toiletten',          'Roca',     'stuk',  18.20,  219.00, 12, 1.00, TRUE),
@@ -121,7 +121,7 @@ INSERT INTO bronze.products (sku, product_name, category, subcategory, brand, un
 -- 4. CUSTOMERS — 40 Belgian professional customers
 -- =============================================================================
 
-INSERT INTO bronze.customers (customer_code, customer_name, customer_type, address, city, postal_code, region, is_professional, is_active) VALUES
+INSERT INTO silver.customers (customer_code, customer_name, customer_type, address, city, postal_code, region, is_professional, is_active) VALUES
 ('CUST-001', 'Loodgieterij Van den Berg BVBA',  'plumber',      'Koningsstraat 14',         'Brussel',     '1000', 'Brussels',       TRUE,  TRUE),
 ('CUST-002', 'Sanitair Service Peeters',         'plumber',      'Turnhoutsebaan 87',        'Antwerpen',   '2140', 'Antwerp',        TRUE,  TRUE),
 ('CUST-003', 'Installatiebedrijf De Smet NV',   'contractor',   'Heuvelstraat 34',          'Gent',        '9000', 'East Flanders',  TRUE,  TRUE),
@@ -167,7 +167,7 @@ INSERT INTO bronze.customers (customer_code, customer_name, customer_type, addre
 -- 5. PRODUCT_SUPPLIERS — preferred supplier per product
 -- =============================================================================
 
-INSERT INTO bronze.product_suppliers (product_id, supplier_id, supplier_unit_cost_eur, supplier_lead_time_days, is_preferred) VALUES
+INSERT INTO silver.product_suppliers (product_id, supplier_id, supplier_unit_cost_eur, supplier_lead_time_days, is_preferred) VALUES
 -- Duravit products → SUP-004
 (1,  4,  245.00,  8, TRUE),  (6,  4,  100.00,  8, TRUE),
 -- Roca products → SUP-002
@@ -200,7 +200,7 @@ INSERT INTO bronze.product_suppliers (product_id, supplier_id, supplier_unit_cos
 (39, 9,   2.41,  3, TRUE),  (50, 9,   4.12,  3, TRUE);
 
 -- secondary suppliers for key products (resilience)
-INSERT INTO bronze.product_suppliers (product_id, supplier_id, supplier_unit_cost_eur, supplier_lead_time_days, is_preferred) VALUES
+INSERT INTO silver.product_suppliers (product_id, supplier_id, supplier_unit_cost_eur, supplier_lead_time_days, is_preferred) VALUES
 (1,  2,  255.00, 14, FALSE),
 (9,  5,   68.00,  6, FALSE),
 (21, 7,    4.10,  4, FALSE),
@@ -219,7 +219,7 @@ INSERT INTO bronze.product_suppliers (product_id, supplier_id, supplier_unit_cos
 -- We encode sensible values per product category
 -- =============================================================================
 
-INSERT INTO bronze.inventory (product_id, location_id, qty_on_hand, qty_reserved, min_stock_level, reorder_point, max_stock_level) VALUES
+INSERT INTO silver.inventory (product_id, location_id, qty_on_hand, qty_reserved, min_stock_level, reorder_point, max_stock_level) VALUES
 -- LOC-BRU (location_id = 1) — Sanicenter Brussel
 (1,  1,  8.00, 1.00,  2.00,  4.00,  20.00),
 (2,  1, 12.00, 2.00,  3.00,  6.00,  25.00),
@@ -480,7 +480,7 @@ INSERT INTO bronze.inventory (product_id, location_id, qty_on_hand, qty_reserved
 -- 7. INVENTORY_MOVEMENTS — initial stock entries (2024-10-01)
 -- =============================================================================
 
-INSERT INTO bronze.inventory_movements (
+INSERT INTO silver.inventory_movements (
     product_id, location_id, movement_type, qty_delta, ref_order_id, ref_order_type, movement_ts, notes
 )
 SELECT
@@ -492,13 +492,13 @@ SELECT
     NULL,
     timestamp '2024-10-01 07:00:00',
     'Opening stock balance 2024-10-01'
-FROM bronze.inventory AS i;
+FROM silver.inventory AS i;
 
 -- =============================================================================
 -- 8. PURCHASE ORDERS — replenishment history Oct–Dec 2024
 -- =============================================================================
 
-INSERT INTO bronze.purchase_orders (supplier_id, location_id, created_at, expected_delivery, actual_delivery, status, total_cost_eur) VALUES
+INSERT INTO silver.purchase_orders (supplier_id, location_id, created_at, expected_delivery, actual_delivery, status, total_cost_eur) VALUES
 -- October replenishments
 (1,  4, '2024-10-03 08:30:00', '2024-10-08',  '2024-10-08',  'received',  4820.00),
 (3,  4, '2024-10-05 09:00:00', '2024-10-12',  '2024-10-13',  'received',  3240.00),
@@ -534,7 +534,7 @@ INSERT INTO bronze.purchase_orders (supplier_id, location_id, created_at, expect
 -- 9. PURCHASE ORDER LINES
 -- =============================================================================
 
-INSERT INTO bronze.purchase_order_lines (po_id, product_id, qty_ordered, qty_received, unit_cost_eur, line_total_eur) VALUES
+INSERT INTO silver.purchase_order_lines (po_id, product_id, qty_ordered, qty_received, unit_cost_eur, line_total_eur) VALUES
 -- PO 1 (Grohe → WH-LGE)
 (1, 5,  100.00, 100.00,  28.00,  2800.00),
 (1, 9,   22.00,  22.00,  62.00,  1364.00),
@@ -632,7 +632,7 @@ INSERT INTO bronze.purchase_order_lines (po_id, product_id, qty_ordered, qty_rec
 -- ~120 orders across 3 sanicenters, realistic Belgian working days
 -- =============================================================================
 
-INSERT INTO bronze.sales_orders (customer_id, location_id, order_ts, status, source, total_amount_eur) VALUES
+INSERT INTO silver.sales_orders (customer_id, location_id, order_ts, status, source, total_amount_eur) VALUES
 -- October 2024
 (1,  1, '2024-10-01 09:15:00', 'fulfilled', 'counter',    485.00),
 (3,  3, '2024-10-01 10:30:00', 'fulfilled', 'counter',    312.50),
@@ -762,7 +762,7 @@ INSERT INTO bronze.sales_orders (customer_id, location_id, order_ts, status, sou
 -- 11. SALES ORDER LINES
 -- =============================================================================
 
-INSERT INTO bronze.sales_order_lines (order_id, product_id, qty_ordered, qty_fulfilled, unit_price_eur, line_total_eur) VALUES
+INSERT INTO silver.sales_order_lines (order_id, product_id, qty_ordered, qty_fulfilled, unit_price_eur, line_total_eur) VALUES
 -- Order 1 (Oct 1, customer 1, BRU)
 (1, 9,  2.00, 2.00, 98.00, 196.00),
 (1, 5,  2.00, 2.00, 45.00,  90.00),
@@ -892,7 +892,7 @@ INSERT INTO bronze.sales_order_lines (order_id, product_id, qty_ordered, qty_ful
 (45, 46,30.00,30.00,  3.90, 117.00);
 
 -- Nov-Dec order lines (abbreviated for remaining orders)
-INSERT INTO bronze.sales_order_lines (order_id, product_id, qty_ordered, qty_fulfilled, unit_price_eur, line_total_eur)
+INSERT INTO silver.sales_order_lines (order_id, product_id, qty_ordered, qty_fulfilled, unit_price_eur, line_total_eur)
 SELECT
     o.order_id,
     p.product_id,
@@ -981,14 +981,14 @@ FROM (
     (120, 9, 2.00), (120,33, 5.00),
     (121, 2, 2.00), (121, 5, 2.00)
 ) AS v(oid, pid, qty)
-JOIN bronze.sales_orders o ON o.order_id = v.oid
-JOIN bronze.products p ON p.product_id = v.pid;
+JOIN silver.sales_orders o ON o.order_id = v.oid
+JOIN silver.products p ON p.product_id = v.pid;
 
 -- =============================================================================
 -- 12. INVENTORY MOVEMENTS — sale movements derived from fulfilled order lines
 -- - =============================================================================
 
-INSERT INTO bronze.inventory_movements (
+INSERT INTO silver.inventory_movements (
     product_id, location_id, movement_type, qty_delta, ref_order_id, ref_order_type, movement_ts, notes
 )
 SELECT
@@ -1000,12 +1000,12 @@ SELECT
     'sales_order',
     so.order_ts,
     'Fulfilled from sales order ' || so.order_id
-FROM bronze.sales_order_lines AS sol
-JOIN bronze.sales_orders AS so
+FROM silver.sales_order_lines AS sol
+JOIN silver.sales_orders AS so
     ON so.order_id = sol.order_id
 WHERE sol.qty_fulfilled > 0;
 
-INSERT INTO bronze.inventory_movements (
+INSERT INTO silver.inventory_movements (
     product_id, location_id, movement_type, qty_delta, ref_order_id, ref_order_type, movement_ts, notes
 )
 SELECT
@@ -1017,8 +1017,8 @@ SELECT
     'purchase_order',
     po.actual_delivery::timestamp + interval '8 hours',
     'Received from PO ' || po.po_id || ' — supplier ' || po.supplier_id
-FROM bronze.purchase_order_lines AS pol
-JOIN bronze.purchase_orders AS po
+FROM silver.purchase_order_lines AS pol
+JOIN silver.purchase_orders AS po
     ON po.po_id = pol.po_id
 WHERE pol.qty_received > 0
     AND po.actual_delivery IS NOT NULL;

@@ -15,7 +15,8 @@ RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && \
 ENV SPARK_HOME=/opt/spark
 ENV PYSPARK_PYTHON=python3
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/opt/project:/opt/project/spark"
 
 USER spark
 
-WORKDIR /opt/spark
+WORKDIR /opt/project/spark

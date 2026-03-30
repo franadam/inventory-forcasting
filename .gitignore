@@ -11,6 +11,20 @@ ENV/
 env.bak/
 venv.bak/
 
+# Airflow
+airflow/logs/
+logs/
+
+# Data
+data/raw/
+data/bronze/
+data/silver/
+data/gold/
+data/rejected/
+
+# config
+airflow/config
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -38,9 +52,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
-# config
-airflow/config
 
 # PyInstaller
 #   Usually these files are written by a python script from a template

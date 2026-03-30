@@ -13,6 +13,7 @@ ARG CONSTRAINT_URL
 ENV AIRFLOW_HOME=/opt/airflow
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/opt/airflow:/opt/project:/opt/project/spark"
 
 USER root
 

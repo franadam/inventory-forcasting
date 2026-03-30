@@ -1,3 +1,4 @@
 pandas
 pyarrow
 psycopg2-binary
+pyspark==4.0.1

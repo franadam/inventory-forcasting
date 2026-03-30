@@ -78,15 +78,19 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     # The following line can be used to set a custom config file, stored in the local config folder
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    PROJECT_ROOT: /opt/project
+    SQL_ROOT: /opt/project/sql
+    SPARK_JOBS_ROOT: /opt/project/spark/jobs
+    PYTHONPATH: /opt/airflow:/opt/project:/opt/project/spark
   volumes:
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/include:/opt/airflow/include
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/tests:/opt/airflow/tests
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/config:/opt/airflow/config
-  - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
-  - ${AIRFLOW_PROJ_DIR:-.}/spark:/opt/airflow/spark
-  - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/airflow/sql
+  - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/project/data
+  - ${AIRFLOW_PROJ_DIR:-.}/spark:/opt/project/spark
+  - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/project/sql
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -370,18 +374,25 @@ services:
       dockerfile: docker/spark/Dockerfile  
     env_file:
       - ${ENV_FILE_PATH:-.env}
+    environment:
+      POSTGRES_CONN_ID: ${POSTGRES_CONN_ID}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PROJECT_ROOT: /opt/project
+      SQL_ROOT: /opt/project/sql
+      SPARK_JOBS_ROOT: /opt/project/spark/jobs
+      PYTHONPATH: /opt/project:/opt/project/spark
     ports:
       - "4040:4040"
     depends_on:
       inventory-postgres:
         condition: service_healthy
     volumes:
-      - ./spark/jobs:/opt/spark/jobs
-      - ./spark/tests:/opt/spark/tests
-      - ./spark/common:/opt/spark/common
-      - ./spark/transformations:/opt/spark/transformations
-      - ./data:/data
-      - ./sql:/opt/spark/sql
+      - ./spark/jobs:/opt/project/spark/jobs
+      - ./spark/tests:/opt/project/spark/tests
+      - ./spark/common:/opt/project/spark/common
+      - ./spark/transformations:/opt/project/spark/transformations
+      - ./data:/opt/project/data
+      - ./sql:/opt/project/sql
     command: ["sleep", "infinity"]
 
 volumes:
