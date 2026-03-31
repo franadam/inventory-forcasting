@@ -5,7 +5,7 @@ from spark.common.config import POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTG
 
 def get_conn_cursor():
     conn = psycopg2.connect(
-        host='inventory-postgres',
+        host=POSTGRES_HOST,
         port=POSTGRES_PORT,
         dbname=POSTGRES_DB,
         user=POSTGRES_USER,
