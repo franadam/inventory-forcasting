@@ -3,7 +3,8 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-from spark.jobs.bronze.load_customers_bronze import create_bronze_tables, populate_bronze_tables
+from spark.common.spark_session import SPARK_CONF
+from spark.jobs.bronze.load_customers_bronze import create_bronze_tables
 
 # Default Args
 default_args = {
@@ -33,9 +34,13 @@ with DAG(
         python_callable=create_bronze_tables,
     )
 
-    populate_bronze_tables_task = PythonOperator(
+    populate_bronze_tables_task = SparkSubmitOperator(
         task_id="populate_bronze_tables",
-        python_callable=populate_bronze_tables
+        conn_id="spark_default",
+        application="/opt/project/spark/jobs/bronze/load_customers_bronze.py",
+        name="populate_bronze_tables",
+        verbose=True,
+        conf=SPARK_CONF
     )
 
     # Define dependencies
