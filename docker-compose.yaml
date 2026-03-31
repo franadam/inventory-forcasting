@@ -60,6 +60,7 @@ x-airflow-common:
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
     AIRFLOW_CONN_INVENTORY_DB: postgresql+psycopg2://${POSTGRES_CONN_USERNAME}:${POSTGRES_CONN_PASSWORD}@inventory-postgres:5432/${POSTGRES_DB}
+    AIRFLOW_CONN_SPARK_DEFAULT: spark://spark-master:7077?deploy-mode=client
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
@@ -82,6 +83,8 @@ x-airflow-common:
     SQL_ROOT: /opt/project/sql
     SPARK_JOBS_ROOT: /opt/project/spark/jobs
     PYTHONPATH: /opt/airflow:/opt/project:/opt/project/spark
+    SPARK_HOME: /opt/spark
+    SPARK_MASTER_URL: spark://spark-master:7077
   volumes:
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/include:/opt/airflow/include
@@ -100,6 +103,8 @@ x-airflow-common:
       condition: service_healthy
     inventory-postgres:
       condition: service_healthy
+    spark-master:
+      condition: service_started
 
 services:
   airflow-postgres:
@@ -368,32 +373,85 @@ services:
     depends_on:
       inventory-postgres:
         condition: service_healthy
-  spark:
+
+  spark-master:
     build:
       context: .
-      dockerfile: docker/spark/Dockerfile  
+      dockerfile: docker/spark/Dockerfile
+    container_name: spark_master
     env_file:
       - ${ENV_FILE_PATH:-.env}
     environment:
-      POSTGRES_CONN_ID: ${POSTGRES_CONN_ID}
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: 7077
+      SPARK_MASTER_WEBUI_PORT: 8081
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_CONN_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_CONN_PASSWORD}
+      POSTGRES_HOST: inventory-postgres
+      POSTGRES_PORT: 5432
       PROJECT_ROOT: /opt/project
       SQL_ROOT: /opt/project/sql
       SPARK_JOBS_ROOT: /opt/project/spark/jobs
       PYTHONPATH: /opt/project:/opt/project/spark
     ports:
-      - "4040:4040"
+      - "7077:7077"
+      - "8081:8081"
     depends_on:
       inventory-postgres:
         condition: service_healthy
     volumes:
-      - ./spark/jobs:/opt/project/spark/jobs
-      - ./spark/tests:/opt/project/spark/tests
-      - ./spark/common:/opt/project/spark/common
-      - ./spark/transformations:/opt/project/spark/transformations
+      - ./spark:/opt/project/spark
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
-    command: ["sleep", "infinity"]
+    command:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.master.Master
+      - --host
+      - spark-master
+      - --port
+      - "7077"
+      - --webui-port
+      - "8081"
+  spark-worker:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: spark_worker
+    env_file:
+      - ${ENV_FILE_PATH:-.env}
+    environment:
+      SPARK_MASTER_URL: spark://spark-master:7077
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_CONN_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_CONN_PASSWORD}
+      POSTGRES_HOST: inventory-postgres
+      POSTGRES_PORT: 5432
+      PROJECT_ROOT: /opt/project
+      SQL_ROOT: /opt/project/sql
+      SPARK_JOBS_ROOT: /opt/project/spark/jobs
+      PYTHONPATH: /opt/project:/opt/project/spark
+    ports:
+      - "8082:8082"
+    depends_on:
+      spark-master:
+        condition: service_started
+      inventory-postgres:
+        condition: service_healthy
+    volumes:
+      - ./spark:/opt/project/spark
+      - ./data:/opt/project/data
+      - ./sql:/opt/project/sql
+    command:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.worker.Worker
+      - spark://spark-master:7077
+      - --webui-port
+      - "8082"
+      - --cores
+      - "2"
+      - --memory
+      - "2g"
 
 volumes:
   postgres-db-volume:
