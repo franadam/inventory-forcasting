@@ -5,6 +5,7 @@ import logging
 
 from spark.common.config import BRONZE_PATH, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_HOST, POSTGRES_PORT
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def read_csv(path: str):

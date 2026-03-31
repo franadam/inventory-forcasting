@@ -1,9 +1,9 @@
 from airflow import DAG
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.operators.python import PythonOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-from spark.jobs.bronze.load_customers_bronze import create_bronze_tables
+from spark.jobs.bronze.load_customers_bronze import create_bronze_tables, populate_bronze_tables
 
 # Default Args
 default_args = {
@@ -33,5 +33,10 @@ with DAG(
         python_callable=create_bronze_tables,
     )
 
+    populate_bronze_tables_task = PythonOperator(
+        task_id="populate_bronze_tables",
+        python_callable=populate_bronze_tables
+    )
+
     # Define dependencies
-    create_bronze_schema_task
+    create_bronze_schema_task >> populate_bronze_tables_task
