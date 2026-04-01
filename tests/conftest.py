@@ -1,0 +1,1 @@
+from tests.fixtures.postgres_fixtures import *

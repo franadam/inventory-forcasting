@@ -88,12 +88,15 @@ x-airflow-common:
   volumes:
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/include:/opt/airflow/include
-  - ${AIRFLOW_PROJ_DIR:-.}/airflow/tests:/opt/airflow/tests
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
   - ${AIRFLOW_PROJ_DIR:-.}/airflow/config:/opt/airflow/config
   - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/project/data
   - ${AIRFLOW_PROJ_DIR:-.}/spark:/opt/project/spark
   - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/project/sql
+  - ${AIRFLOW_PROJ_DIR:-.}/tests/airflow:/opt/project/tests/airflow
+  - ${AIRFLOW_PROJ_DIR:-.}/tests/sql:/opt/project/tests/sql
+  - ${AIRFLOW_PROJ_DIR:-.}/tests/2e2:/opt/project/tests/2e2
+  - ${AIRFLOW_PROJ_DIR:-.}/tests:/opt/project/tests
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -404,6 +407,7 @@ services:
       - ./spark:/opt/project/spark
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
+      - ./tests/spark:/opt/project/tests/spark
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
@@ -442,6 +446,7 @@ services:
       - ./spark:/opt/project/spark
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
+      - ./tests/spark:/opt/project/tests/spark
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker

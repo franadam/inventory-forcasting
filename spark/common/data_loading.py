@@ -20,8 +20,6 @@ def read_csv(spark: SparkSession, path: str, infer_schema: bool = True) -> DataF
     logger.info(f"CSV loaded from {path}")
     return df
 
-
-
 def save_into_db(schema: str, table: str, dataframe: DataFrame, mode: str = "overwrite") -> None:
     jdbc_url = f"jdbc:postgresql://{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     (
