@@ -1,18 +1,28 @@
 from pyspark.sql import SparkSession
 
-SPARK_JOB_ROOT = "/opt/project/spark/jobs"
-POSTGRES_JDBC_JAR = "/opt/spark/jars/postgresql-42.7.8.jar"
+from spark.common.config import APP_NAME
+from spark.common.spark_config import DEFAULT_SPARK_CONF
 
-SPARK_CONF = {
-    "spark.master": "spark://spark-master:7077",
-    "spark.submit.deployMode": "client",
-    "spark.driver.extraClassPath": POSTGRES_JDBC_JAR,
-    "spark.executor.extraClassPath": POSTGRES_JDBC_JAR,
-    "spark.executorEnv.PYTHONPATH": "/opt/project:/opt/project/spark",
-    "spark.log.level":"WARN"
-}
 
-spark = SparkSession\
-    .builder\
-    .appName("inventory_forcasting")\
-    .getOrCreate()
+def build_spark_session(
+    app_name: str ,
+    extra_conf: dict[str, str] | None = None,
+) -> SparkSession:
+    """
+    Build and return a SparkSession with the default project configuration.
+    Extra Spark configuration can be injected with extra_conf.
+    """
+    final_app_name = app_name or APP_NAME
+    conf = DEFAULT_SPARK_CONF.copy()
+
+    if extra_conf:
+        conf.update(extra_conf)
+
+    builder = SparkSession.builder.appName(final_app_name)
+
+    for key, value in conf.items():
+        builder = builder.config(key, value)
+
+    spark = builder.getOrCreate()
+    spark.sparkContext.setLogLevel("WARN")
+    return spark
