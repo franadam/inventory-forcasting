@@ -408,6 +408,7 @@ services:
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
       - ./tests/spark:/opt/project/tests/spark
+      - ./tests:/opt/project/tests
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
@@ -447,6 +448,7 @@ services:
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
       - ./tests/spark:/opt/project/tests/spark
+      - ./tests:/opt/project/tests
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker

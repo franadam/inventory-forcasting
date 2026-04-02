@@ -24,5 +24,5 @@ def build_spark_session(
         builder = builder.config(key, value)
 
     spark = builder.getOrCreate()
-    spark.sparkContext.setLogLevel("WARN")
+    spark.sparkContext.setLogLevel("INFO")
     return spark

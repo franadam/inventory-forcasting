@@ -3,7 +3,7 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-from spark.jobs.bronze.load_customers_bronze import create_bronze_tables
+from inventory_forcasting.spark.jobs.bronze.load_bronze_tables import create_bronze_tables
 
 # Default Args
 default_args = {
