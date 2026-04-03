@@ -27,28 +27,38 @@ def ingest_postgresql_table(spark:SparkSession, input_path:str, schema:str, tabl
     logger.info( f"{table} table in the {schema} schema populated successfully")
 
 def populate_bronze_tables() -> None:
-    logger.info("populate_bronze_tables not implemented yet")
+    logger.info("Starting bronze population job")
+    logger.info(f"BRONZE_PATH = {BRONZE_PATH}")
+
+    if not os.path.exists(BRONZE_PATH):
+        raise FileNotFoundError(f"BRONZE_PATH does not exist: {BRONZE_PATH}")
+        
+    csv_files = [
+        elem.path
+        for elem in os.scandir(BRONZE_PATH)
+        if elem.is_file() and elem.name.lower().endswith(".csv")
+    ]
+
+    logger.info("Found %s CSV file(s) in %s", len(csv_files), BRONZE_PATH)
+    logger.info("Files found: %s", [os.path.basename(f) for f in csv_files])
+    
     spark = build_spark_session(app_name="populate_bronze_tables")
     try:
-        for elem in os.scandir(BRONZE_PATH):
-            if elem.is_file() and elem.name.endswith(".csv"):
-                file_path = elem.path
-                file_name = os.path.basename(file_path)
-                table = file_name.split('.')[0]
-                logger.info(f"starting to populate bronze_{table} with {file_name} file")
-                df = read_csv(spark=spark, path=file_path)
-                save_into_db(schema='bronze', table=table,dataframe=df)
-                logger.info(f"bronze {table} table was populated successfully")
+        for file_path in csv_files:
+            file_name = os.path.basename(file_path)
+            table = os.path.splitext(file_name)[0]
+            logger.info(f"starting to populate bronze_{table} with {file_name} file")
+            df = read_csv(spark=spark, path=file_path)
+            save_into_db(schema='bronze', table=table, dataframe=df)
+            logger.info(f"bronze {table} table was populated successfully")
     except Exception as e:
         logger.error(f"An error occurred during the population of bronze tables: {e}")
         raise    
     finally:
         spark.stop()            
 
+def job():
+    populate_bronze_tables()
+
 if __name__ == "__main__":
-    spark = build_spark_session(app_name="data_loading")
-    input_path = os.path.join(BRONZE_PATH, "customers.csv")
-    logger.info("read customers data from db")
-    ingest_postgresql_table(spark, input_path,'bronze', 'costumers')
-    df = read_postgresql_table(spark, 'bronze', 'costumers')
-    df.show()
+    job()

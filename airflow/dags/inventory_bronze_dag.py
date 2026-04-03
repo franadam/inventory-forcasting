@@ -3,7 +3,7 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-from inventory_forcasting.spark.jobs.bronze.load_bronze_tables import create_bronze_tables
+from spark.jobs.bronze.load_bronze_tables import create_bronze_tables
 
 # Default Args
 default_args = {
@@ -24,7 +24,8 @@ with DAG(
     default_args=default_args,
     description="DAG to load raw data into database",
     schedule="0 14 * * *",
-    catchup=False
+    catchup=False,
+    tags=["bronze", "inventory", "spark"],
 ) as dag_bronze:
     
     # Define tasks
@@ -36,7 +37,7 @@ with DAG(
     populate_bronze_tables_task = SparkSubmitOperator(
         task_id="populate_bronze_tables",
         conn_id="spark_default",
-        application="/opt/project/spark/jobs/bronze/load_customers_bronze.py",
+        application="/opt/project/spark/jobs/bronze/load_bronze_tables.py",
         name="populate_bronze_tables",
         verbose=True
     )
