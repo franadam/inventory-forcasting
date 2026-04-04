@@ -1,4 +1,4 @@
-from spark.jobs.bronze.load_bronze_tables import ingest_postgresql_table
+from spark.jobs.bronze.load_bronze_tables_job import ingest_postgresql_table
 
 def test_ingest_postgresql_table_writes_rows(
     spark,

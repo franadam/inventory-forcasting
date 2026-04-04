@@ -63,7 +63,8 @@ def clean_is_professional_types(df:DataFrame) -> DataFrame:
     return cleaned_df
 
 def clean_is_active_types(df:DataFrame) -> DataFrame:
-    cleaned_df = clean_boolean_types(df, column='is_active')
+    cleaned_df = trim_lower_column(df, 'is_active')
+    cleaned_df = clean_boolean_types(cleaned_df, column='is_active')
     return cleaned_df
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from pyspark.sql import functions as F
 
-from spark.jobs.bronze.load_bronze_tables import read_csv
+from spark.jobs.bronze.load_bronze_tables_job import read_csv
 
 def test_read_csv(spark, sample_locations_csv):
     df = read_csv(

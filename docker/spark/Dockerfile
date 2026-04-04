@@ -15,7 +15,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${PATH}"
 ENV PYSPARK_PYTHON=python3
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH="/opt/project:/opt/project/spark"
+ENV PYTHONPATH="/opt/project:/opt"
 
 USER root
 

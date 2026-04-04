@@ -12,8 +12,8 @@ env.bak/
 venv.bak/
 
 # Airflow
-airflow/logs/
-logs/
+orchestration/logs/
+orchestration/config
 
 # Data
 data/raw/
@@ -23,7 +23,7 @@ data/gold/
 data/rejected/
 
 # config
-airflow/config
+/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

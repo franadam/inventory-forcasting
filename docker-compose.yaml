@@ -59,11 +59,14 @@ x-airflow-common:
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
+    #conn_id
     AIRFLOW_CONN_INVENTORY_DB: postgresql+psycopg2://${POSTGRES_CONN_USERNAME}:${POSTGRES_CONN_PASSWORD}@inventory-postgres:5432/${POSTGRES_DB}
     AIRFLOW_CONN_SPARK_DEFAULT: spark://spark-master:7077?deploy-mode=client
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/orchestration/dags
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/orchestration/logs
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
@@ -82,14 +85,15 @@ x-airflow-common:
     PROJECT_ROOT: /opt/project
     SQL_ROOT: /opt/project/sql
     SPARK_JOBS_ROOT: /opt/project/spark/jobs
-    PYTHONPATH: /opt/airflow:/opt/project:/opt/project/spark
+    PYTHONPATH: /opt:/opt/project
     SPARK_HOME: /opt/spark
     SPARK_MASTER_URL: spark://spark-master:7077
   volumes:
-  - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
-  - ${AIRFLOW_PROJ_DIR:-.}/airflow/include:/opt/airflow/include
-  - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
-  - ${AIRFLOW_PROJ_DIR:-.}/airflow/config:/opt/airflow/config
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration:/opt/orchestration
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/dags:/opt/orchestration/dags
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/include:/opt/orchestration/include
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/logs:/opt/orchestration/logs
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/config:/opt/orchestration/config
   - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/project/data
   - ${AIRFLOW_PROJ_DIR:-.}/spark:/opt/project/spark
   - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/project/sql

@@ -20,7 +20,7 @@ ENV PYTHONUNBUFFERED=1
 ENV SPARK_HOME=/opt/spark
 ENV JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:${SPARK_HOME}/bin:${PATH}"
-ENV PYTHONPATH="/opt/airflow:/opt/project:/opt/project/spark"
+ENV PYTHONPATH="/opt:/opt/project"
 
 USER root
 
@@ -61,4 +61,4 @@ RUN pip install --no-cache-dir \
 
 RUN rm -rf /tmp/requirements.txt
 
-WORKDIR ${AIRFLOW_HOME}
+WORKDIR /opt/orchestration
