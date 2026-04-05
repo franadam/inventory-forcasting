@@ -5,7 +5,7 @@ from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOpe
 from orchestration.dag_config import DEFAULT_AIRFLOW_ARGS
 
 with DAG(
-    dag_id="clean_bronze_tables_dag",
+    dag_id="silver_dag",
     default_args=DEFAULT_AIRFLOW_ARGS,
     description="DAG to clean customer raw data and save it into database",
     schedule="0 14 * * *",
