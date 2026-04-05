@@ -4,9 +4,8 @@ from pyspark.sql import DataFrame, SparkSession
 
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_postgresql_table, save_into_db
-from spark.transformations.silver.customers import (clean_address, clean_customer_name, clean_customer_type, standardize_customer_code, 
-                                                    standardize_postal_code, clean_city, clean_region, 
-                                                    clean_is_professional_types, clean_is_active_types)
+from spark.common.clean_utils import clean_is_active_types, clean_city, standardize_postal_code, clean_region, clean_address
+from spark.transformations.silver.customers import clean_customer_name, clean_customer_type, standardize_customer_code, clean_is_professional_types
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,16 +24,15 @@ def clean_customers() -> DataFrame:
     cleaned_df = clean_is_active_types(cleaned_df)
     
     #save_into_db(schema='silver', table='customers', dataframe=cleaned_df, mode='append')
-    return cleaned_df
-
-def job():
-    clean_customers()
+    save_into_db(schema='staging', table='customers', dataframe=cleaned_df)
+    return cleaned_df  
 
 if __name__ == "__main__":
-    spark = build_spark_session('clean_customers')
-    df = read_postgresql_table(spark=spark, schema='bronze', table='customers')
-    logger.info("Preview of customers.csv")
-    df.show(5, truncate=False)
-    cleaned_df= clean_customers()
-    logger.info("Preview of formated customers.csv")
-    cleaned_df.show(5, truncate=False)
+    #spark = build_spark_session('clean_customers')
+    #df = read_postgresql_table(spark=spark, schema='bronze', table='customers')
+    #logger.info("Preview of customers.csv")
+    #df.show(5, truncate=False)
+    #cleaned_df= clean_customers()
+    #logger.info("Preview of formated customers.csv")
+    #cleaned_df.show(5, truncate=False)
+    clean_customers()
