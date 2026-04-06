@@ -30,6 +30,14 @@ with DAG(
         name="clean_locations",
         verbose=True
     )
+    
+    clean_products_task = SparkSubmitOperator(
+        task_id="clean_products",
+        conn_id=SPARK_CONN_ID,
+        application="/opt/project/spark/jobs/silver/clean_product_job.py",
+        name="clean_products",
+        verbose=True
+    )
 
     # Define dependencies
-    clean_customers_task >> clean_locations_task
+    clean_customers_task >> clean_locations_task >> clean_products_task
