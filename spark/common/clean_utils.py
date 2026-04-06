@@ -1,6 +1,7 @@
 import os
 from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
+from pyspark.sql.types import BooleanType, IntegerType, FloatType
 
 def trim_lower_column(df:DataFrame, column:str) -> DataFrame:
     cleaned_df = (df
@@ -14,7 +15,7 @@ def clean_boolean_types(df:DataFrame, column:str) -> DataFrame:
     cleaned_df = df \
         .withColumn(column,
                         F.initcap(F.col(column)))\
-        .withColumn(column, F.lit(F.col(column)).cast('boolean'))
+        .withColumn(column, F.lit(F.col(column)).cast(BooleanType()))
     return cleaned_df
 
 def clean_capital_name(df:DataFrame, column:str) -> DataFrame:
@@ -59,4 +60,16 @@ def clean_region(df:DataFrame) -> DataFrame:
 
 def clean_postal_code(df:DataFrame) -> DataFrame:
     cleaned_df = standardize_postal_code(df)
+    return cleaned_df
+
+def clean_decimal(df:DataFrame, column:str) -> DataFrame:
+    cleaned_df = df \
+        .withColumn(column, F.regexp_replace(F.col(column), r",", ".")) \
+        .withColumn(column, F.lit(F.col(column)).cast(FloatType()))
+    return cleaned_df
+
+def clean_int(df:DataFrame, column:str) -> DataFrame:
+    cleaned_df = df \
+        .withColumn(column, F.regexp_replace(F.col(column), r",", ".")) \
+        .withColumn(column, F.lit(F.col(column)).cast(IntegerType()))
     return cleaned_df

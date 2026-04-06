@@ -49,12 +49,12 @@ def save_into_db(schema: str, table: str, dataframe: DataFrame, mode: str = "ove
     )
     logger.info(f"Data written to {schema}.{table}")
 
-if __name__ == "__main__":
-    spark = build_spark_session(app_name="data_loading")
-    df = read_csv(spark,os.path.join(BRONZE_PATH, "customers.csv"))
-    logger.info("Preview of customers.csv")
-    df.show(5, truncate=False)
-    df.printSchema()
+#if __name__ == "__main__":
+    #spark = build_spark_session(app_name="data_loading")
+    #df = read_csv(spark,os.path.join(BRONZE_PATH, "customers.csv"))
+    #logger.info("Preview of customers.csv")
+    #df.show(5, truncate=False)
+    #df.printSchema()
     #logger.info("save customers data into db")
     #save_into_db(schema='bronze', table='customers',dataframe=df)
     #logger.info("read customers data from db")
