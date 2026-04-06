@@ -14,13 +14,14 @@ POSTGRES_PORT = os.getenv("POSTGRES_CONN_PORT")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_USER = os.getenv("POSTGRES_CONN_USERNAME")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_CONN_PASSWORD")
-POSTGRES_CONN_ID = os.getenv("POSTGRES_CONN_IDo", "inventory_db")
+POSTGRES_CONN_ID = os.getenv("POSTGRES_CONN_ID", "inventory_db")
 
 # Spark params
-POSTGRES_JDBC_JAR = os.getenv("POSTGRES_JDBC_JAR", "/opt/spark/jars/postgresql-42.7.8.jar")
-SPARK_MASTER_URL = os.getenv("SPARK_MASTER_URL", "spark://spark-master:7077")
-SPARK_DEPLOY_MODE = os.getenv("SPARK_DEPLOY_MODE", "client")
-PYTHONPATH_VALUE = os.getenv("PYTHONPATH", "/opt/project:/opt/project/spark")
+POSTGRES_JDBC_JAR = os.getenv("POSTGRES_JDBC_JAR")
+SPARK_MASTER_URL = os.getenv("SPARK_MASTER_URL")
+SPARK_DEPLOY_MODE = os.getenv("SPARK_DEPLOY_MODE")
+PYTHONPATH_VALUE = os.getenv("PYTHONPATH")
+SPARK_CONN_ID = os.getenv("SPARK_CONN_ID")
 
 # Paths
 BRONZE_PATH = os.getenv("BRONZE_PATH", f"{PROJECT_ROOT}/data/bronze")
