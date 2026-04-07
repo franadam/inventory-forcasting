@@ -58,15 +58,15 @@ x-airflow-common:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
     #conn_id
-    AIRFLOW_CONN_INVENTORY_DB: postgresql+psycopg2://${POSTGRES_CONN_USERNAME}:${POSTGRES_CONN_PASSWORD}@inventory-postgres:5432/${POSTGRES_DB}
+    AIRFLOW_CONN_INVENTORY_DB: postgresql://${POSTGRES_CONN_USERNAME}:${POSTGRES_CONN_PASSWORD}@inventory-postgres:5432/${POSTGRES_DB}
     AIRFLOW_CONN_SPARK_DEFAULT: spark://spark-master:7077?deploy-mode=client
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@airflow-postgres/${METADATA_DATABASE_NAME}
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
-    AIRFLOW__CORE__DAGS_FOLDER: /opt/orchestration/dags
-    AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/orchestration/logs
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/project/orchestration/dags
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/project/orchestration/logs
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
@@ -413,6 +413,7 @@ services:
       - ./sql:/opt/project/sql
       - ./tests/spark:/opt/project/tests/spark
       - ./tests:/opt/project/tests
+      - ./orchestration:/opt/project/orchestration
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
@@ -451,6 +452,7 @@ services:
       - ./spark:/opt/project/spark
       - ./data:/opt/project/data
       - ./sql:/opt/project/sql
+      - ./orchestration:/opt/project/orchestration
       - ./tests/spark:/opt/project/tests/spark
       - ./tests:/opt/project/tests
     command:

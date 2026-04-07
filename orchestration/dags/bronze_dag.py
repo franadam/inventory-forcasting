@@ -4,7 +4,6 @@ from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOpe
 
 from orchestration.dag_config import DEFAULT_AIRFLOW_ARGS
 from spark.common.spark_config import SPARK_CONN_ID
-from spark.jobs.bronze.load_bronze_tables_job import create_bronze_tables
 
 with DAG(
     dag_id="bronze_dag",
@@ -16,11 +15,6 @@ with DAG(
 ) as dag_bronze:
     
     # Define tasks
-    create_bronze_schema_task = PythonOperator(
-        task_id="create_bronze_schema",
-        python_callable=create_bronze_tables,
-    )
-
     populate_bronze_tables_task = SparkSubmitOperator(
         task_id="populate_bronze_tables",
         conn_id=SPARK_CONN_ID,
@@ -30,4 +24,4 @@ with DAG(
     )
 
     # Define dependencies
-    create_bronze_schema_task >> populate_bronze_tables_task
+    populate_bronze_tables_task

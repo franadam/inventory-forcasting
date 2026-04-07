@@ -12,12 +12,21 @@ with DAG(
     tags=["silver", "full-pipeline", "spark", "bronze", "gold"],
 ) as dag_full_pipeline:
     
-    # Define tasks
+    # Define tasks    
+    trigger_schemas_dag_task = TriggerDagRunOperator(
+        task_id="trigger_schemas_dag",
+        trigger_dag_id="schemas_dag",
+        wait_for_completion=True,
+        poke_interval=10,
+        allowed_states=["success"],
+        failed_states=["failed"],
+    )
+    
     trigger_bronze_dag_task = TriggerDagRunOperator(
         task_id="trigger_bronze_dag",
         trigger_dag_id="bronze_dag",
         wait_for_completion=True,
-        poke_interval=30,
+        poke_interval=10,
         allowed_states=["success"],
         failed_states=["failed"],
     )
@@ -26,10 +35,10 @@ with DAG(
         task_id="trigger_silver_dag",
         trigger_dag_id="silver_dag",
         wait_for_completion=True,
-        poke_interval=30,
+        poke_interval=10,
         allowed_states=["success"],
         failed_states=["failed"],
     )
 
     # Define dependencies
-    trigger_bronze_dag_task >> trigger_silver_dag_task
+    trigger_schemas_dag_task >> trigger_bronze_dag_task >> trigger_silver_dag_task
