@@ -89,11 +89,11 @@ x-airflow-common:
     SPARK_HOME: /opt/spark
     SPARK_MASTER_URL: spark://spark-master:7077
   volumes:
-  - ${AIRFLOW_PROJ_DIR:-.}/orchestration:/opt/orchestration
-  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/dags:/opt/orchestration/dags
-  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/include:/opt/orchestration/include
-  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/logs:/opt/orchestration/logs
-  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/config:/opt/orchestration/config
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration:/opt/project/orchestration
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/dags:/opt/project/orchestration/dags
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/include:/opt/project/orchestration/include
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/logs:/opt/project/orchestration/logs
+  - ${AIRFLOW_PROJ_DIR:-.}/orchestration/config:/opt/project/orchestration/config
   - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/project/data
   - ${AIRFLOW_PROJ_DIR:-.}/spark:/opt/project/spark
   - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/project/sql
