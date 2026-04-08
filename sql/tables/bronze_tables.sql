@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS bronze.products (
     , min_order_qty     DECIMAL(15,2)
     , is_active         BOOLEAN 
     , created_at        TIMESTAMP 
-    , upDATEd_at        TIMESTAMP 
+    , updated_at        TIMESTAMP 
 );
 
 CREATE TABLE IF NOT EXISTS bronze.customers (

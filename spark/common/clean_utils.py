@@ -1,4 +1,5 @@
 import os
+import re
 from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
 from pyspark.sql.types import BooleanType, IntegerType, FloatType
@@ -24,10 +25,8 @@ def clean_capital_name(df:DataFrame, column:str) -> DataFrame:
     return cleaned_df
 
 def standardize_postal_code(df:DataFrame, column:str="postal_code") -> DataFrame:
-    cleaned_df = df.withColumn(column,
-                        F.regexp_extract(F.col(column),
-                                        r"(\d+)", 1)
-    )
+    cleaned_df = df.\
+        withColumn(column, F.regexp_extract(F.col(column), r"(\d+)", 1))
     return cleaned_df
 
 def clean_is_active_types(df:DataFrame, column:str="is_active") -> DataFrame:
@@ -62,14 +61,44 @@ def clean_postal_code(df:DataFrame) -> DataFrame:
     cleaned_df = standardize_postal_code(df)
     return cleaned_df
 
-def clean_decimal(df:DataFrame, column:str) -> DataFrame:
+def remove_na(df: DataFrame, column: str) -> DataFrame:
+    pattern_na = r"(?i)^\s*n[\s\./-]?a\s*$"
     cleaned_df = df \
-        .withColumn(column, F.regexp_replace(F.col(column), r",", ".")) \
-        .withColumn(column, F.lit(F.col(column)).cast(FloatType()))
+        .withColumn(column, F.trim(F.col(column))) \
+        .withColumn(
+            column,
+            F.when(F.col(column).rlike(pattern_na), None)
+             .otherwise(F.col(column))
+    )
+    return cleaned_df
+
+def clean_decimal(df: DataFrame, column: str) -> DataFrame:
+    cleaned_df = remove_na(df, column) \
+        .withColumn(column, F.regexp_replace(F.col(column), ",", ".")) \
+        .withColumn(column, F.col(column).cast(FloatType()))
     return cleaned_df
 
 def clean_int(df:DataFrame, column:str) -> DataFrame:
-    cleaned_df = df \
+    cleaned_df = remove_na(df, column) \
         .withColumn(column, F.regexp_replace(F.col(column), r",", ".")) \
         .withColumn(column, F.lit(F.col(column)).cast(IntegerType()))
     return cleaned_df
+
+def standardize_date(df: DataFrame, column: str) -> DataFrame:
+    cleaned_df = remove_na(df, column)
+
+    parsed_ts = F.coalesce(
+        F.try_to_timestamp(F.col(column), F.lit("yyyy-MM-dd HH:mm:ss")),
+        F.try_to_timestamp(F.col(column), F.lit("yyyy/MM/dd HH:mm:ss"))
+    )
+
+    cleaned_df = cleaned_df\
+        .withColumn(column, parsed_ts)\
+        .filter(F.col(column).isNotNull())
+    return cleaned_df
+
+""""
+pyspark.errors.exceptions.captured.NumberFormatException: 
+[CAST_INVALID_INPUT] The value 'N/A' of the type "STRING" cannot be cast to "FLOAT" because it is malformed. 
+Correct the value as per the syntax, or change its target type. Use `try_cast` to tolerate malformed input and return NULL instead. SQLSTATE: 22018
+"""

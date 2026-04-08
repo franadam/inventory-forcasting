@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_postgresql_table, save_into_db
-from spark.common.clean_utils import clean_decimal, clean_int, clean_is_active_types, clean_capital_name, trim_lower_column, clean_address, standardize_postal_code
+from spark.common.clean_utils import clean_decimal, clean_int, standardize_date, clean_is_active_types, clean_capital_name, trim_lower_column, clean_address, standardize_postal_code
 from spark.transformations.silver.products import clean_product_name, clean_unit_weight_kg, clean_unit_price_eur,clean_min_order_qty, clean_lead_time_days, standardize_product_code, clean_subcategory
 
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +24,8 @@ def clean_products() -> DataFrame:
     cleaned_df = clean_min_order_qty(cleaned_df)
     cleaned_df = clean_lead_time_days(cleaned_df)
     cleaned_df = clean_is_active_types(cleaned_df)
+    cleaned_df = standardize_date(cleaned_df, "created_at")
+    cleaned_df = standardize_date(cleaned_df, "updated_at")
     
     #save_into_db(schema='silver', table='products', dataframe=cleaned_df, mode='append')
     save_into_db(schema='staging', table='products', dataframe=cleaned_df)
