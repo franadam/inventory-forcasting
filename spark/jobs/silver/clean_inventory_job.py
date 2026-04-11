@@ -25,15 +25,5 @@ def clean_inventory() -> DataFrame:
     return cleaned_df
 
 if __name__ == "__main__":
-    spark = build_spark_session('clean_inventory')
-    df = read_postgresql_table(spark=spark, schema='bronze', table='inventory')
-    logger.info("Preview of inventory.csv")
-    df.show(5, truncate=False)
-    last_updated = df.last_updated
-    last_updated_array = df.select('last_updated').toPandas()['last_updated']
-    cleaned_df= clean_inventory()
-    #print(last_updated_array)
-    logger.info("Preview of formated inventory.csv")
-    cleaned_df.show(5, truncate=False)
-    #clean_inventory()
+    clean_inventory()
     

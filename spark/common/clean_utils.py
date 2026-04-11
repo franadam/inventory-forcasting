@@ -85,11 +85,13 @@ def clean_int(df:DataFrame, column:str) -> DataFrame:
     return cleaned_df
 
 def standardize_date(df: DataFrame, column: str) -> DataFrame:
-    cleaned_df = remove_na(df, column)
+    cleaned_df = df.withColumn(f"{column}_raw", F.col(column))
+    cleaned_df = remove_na(cleaned_df, column)\
+        .withColumn(column, F.regexp_replace(F.col(column), "/", "-"))
 
     parsed_ts = F.coalesce(
         F.try_to_timestamp(F.col(column), F.lit("yyyy-MM-dd HH:mm:ss")),
-        F.try_to_timestamp(F.col(column), F.lit("yyyy/MM/dd HH:mm:ss"))
+        F.try_to_timestamp(F.col(column), F.lit("yyyy-dd-MM HH:mm:ss"))
     )
 
     cleaned_df = cleaned_df\
@@ -97,8 +99,8 @@ def standardize_date(df: DataFrame, column: str) -> DataFrame:
         .filter(F.col(column).isNotNull())
     return cleaned_df
 
-""""
-pyspark.errors.exceptions.captured.NumberFormatException: 
-[CAST_INVALID_INPUT] The value 'N/A' of the type "STRING" cannot be cast to "FLOAT" because it is malformed. 
-Correct the value as per the syntax, or change its target type. Use `try_cast` to tolerate malformed input and return NULL instead. SQLSTATE: 22018
-"""
+def clean_ids(df:DataFrame, column:str, threshold:int=100) -> DataFrame:
+    col = F.abs(F.col(column))
+    cleaned_df = clean_int(df, column)\
+        .where(col < threshold)
+    return cleaned_df
