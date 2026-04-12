@@ -1,8 +1,10 @@
 import os
 import re
+from word2number import w2n
 from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
 from pyspark.sql.types import BooleanType, IntegerType, FloatType
+from pyspark.sql.functions import udf
 
 def trim_lower_column(df:DataFrame, column:str) -> DataFrame:
     cleaned_df = (df
@@ -78,10 +80,24 @@ def clean_decimal(df: DataFrame, column: str) -> DataFrame:
         .withColumn(column, F.col(column).cast(FloatType()))
     return cleaned_df
 
+def clean_cost(df: DataFrame, column: str) -> DataFrame:
+    cleaned_df = clean_decimal(df, column)\
+        .where(F.col(column) > 0)
+    return cleaned_df
+
+def convert_word_number(word):
+    try:
+        return w2n.word_to_num(word)
+    except:
+        return None
+
 def clean_int(df:DataFrame, column:str) -> DataFrame:
+    convert_udf = udf(convert_word_number, IntegerType())
     cleaned_df = remove_na(df, column) \
         .withColumn(column, F.regexp_replace(F.col(column), r",", ".")) \
-        .withColumn(column, F.lit(F.col(column)).cast(IntegerType()))
+        .withColumn(column, convert_udf(column))\
+        .filter(F.col(column).isNotNull())
+        #.withColumn(column, F.lit(F.col(column)).cast(IntegerType()))
     return cleaned_df
 
 def standardize_date(df: DataFrame, column: str) -> DataFrame:

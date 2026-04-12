@@ -3,3 +3,4 @@ pyarrow
 psycopg2-binary
 pyspark==4.0.1
 pytest==8.3.3
+word2number
