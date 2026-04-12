@@ -66,11 +66,12 @@ def clean_postal_code(df:DataFrame) -> DataFrame:
 
 def remove_na(df: DataFrame, column: str) -> DataFrame:
     pattern_na = r"(?i)^\s*n[\s\./-]?a\s*$"
+    pattern_invalid = r"(?i)^\s*(n[\s\./-]?a|nan|null|none|nil|missing|unknown|errors|err(or)?|fail(ed)?|invalid)\s*$"
     cleaned_df = df \
         .withColumn(column, F.trim(F.col(column))) \
         .withColumn(
             column,
-            F.when(F.col(column).rlike(pattern_na), None)
+            F.when(F.col(column).rlike(pattern_invalid), None)
              .otherwise(F.col(column))
     )
     return cleaned_df
