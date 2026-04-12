@@ -62,6 +62,14 @@ with DAG(
         name="clean_inventory_movements",
         verbose=True
     )
+    
+    clean_product_suppliers_task = SparkSubmitOperator(
+        task_id="clean_product_suppliers",
+        conn_id=SPARK_CONN_ID,
+        application="/opt/project/spark/jobs/silver/clean_product_suppliers_job.py",
+        name="clean_product_suppliers",
+        verbose=True
+    )
 
     # Define dependencies
-    clean_customers_task >> clean_locations_task >> clean_products_task >> clean_suppliers_task >> clean_inventory_task >> clean_inventory_movements_task
+    clean_customers_task >> clean_locations_task >> clean_products_task >> clean_suppliers_task >> clean_inventory_task >> clean_inventory_movements_task >> clean_product_suppliers_task

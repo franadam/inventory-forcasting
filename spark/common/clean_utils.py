@@ -100,6 +100,11 @@ def clean_int(df:DataFrame, column:str) -> DataFrame:
         #.withColumn(column, F.lit(F.col(column)).cast(IntegerType()))
     return cleaned_df
 
+def clean_lead_time_days(df:DataFrame, column:str) -> DataFrame:
+    cleaned_df = clean_int(df, column)\
+        .where(F.col(column) > 0)
+    return cleaned_df
+
 def standardize_date(df: DataFrame, column: str) -> DataFrame:
     cleaned_df = df.withColumn(f"{column}_raw", F.col(column))
     cleaned_df = remove_na(cleaned_df, column)\
