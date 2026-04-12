@@ -24,9 +24,4 @@ def clean_product_suppliers() -> DataFrame:
     return cleaned_df
 
 if __name__ == "__main__":    
-    spark = build_spark_session('clean_product_suppliers')
-    df = read_postgresql_table(spark=spark, schema='bronze', table='product_suppliers')
-    df.show(5, truncate=False)
-    cleaned_df = clean_product_suppliers()
-    logger.info("Preview of formated suppliers.csv")
-    cleaned_df.show(5, truncate=False)
+    clean_product_suppliers()

@@ -33,7 +33,8 @@ def standardize_postal_code(df:DataFrame, column:str="postal_code") -> DataFrame
 
 def clean_is_active_types(df:DataFrame, column:str="is_active") -> DataFrame:
     cleaned_df = trim_lower_column(df, column)
-    cleaned_df = clean_boolean_types(cleaned_df, column)
+    cleaned_df = clean_boolean_types(cleaned_df, column)\
+        .withColumn(column, F.ifnull(F.col(column), F.lit(False)))
     return cleaned_df
 
 def clean_city(df:DataFrame) -> DataFrame:
@@ -105,7 +106,7 @@ def clean_lead_time_days(df:DataFrame, column:str) -> DataFrame:
         .where(F.col(column) > 0)
     return cleaned_df
 
-def standardize_date(df: DataFrame, column: str) -> DataFrame:
+def standardize_datetime(df: DataFrame, column: str) -> DataFrame:
     cleaned_df = df.withColumn(f"{column}_raw", F.col(column))
     cleaned_df = remove_na(cleaned_df, column)\
         .withColumn(column, F.regexp_replace(F.col(column), "/", "-"))
@@ -117,6 +118,21 @@ def standardize_date(df: DataFrame, column: str) -> DataFrame:
 
     cleaned_df = cleaned_df\
         .withColumn(column, parsed_ts)\
+        .filter(F.col(column).isNotNull())
+    return cleaned_df
+
+def standardize_date(df: DataFrame, column: str) -> DataFrame:
+    cleaned_df = df.withColumn(f"{column}_raw", F.col(column))
+    cleaned_df = remove_na(cleaned_df, column)\
+        .withColumn(column, F.regexp_replace(F.col(column), "/", "-"))\
+
+    parsed_date = F.coalesce(
+        F.try_to_timestamp(F.col(column), F.lit("dd-MM-yyyy")),
+        F.try_to_timestamp(F.col(column), F.lit("yyyy-MM-dd")),
+    )
+
+    cleaned_df = cleaned_df\
+        .withColumn(column, F.to_date(parsed_date))\
         .filter(F.col(column).isNotNull())
     return cleaned_df
 
