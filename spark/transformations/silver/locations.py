@@ -32,7 +32,8 @@ def clean_location_type(df:DataFrame) -> DataFrame:
     return cleaned_df
     
 def clean_location_name(df:DataFrame) -> DataFrame:
-    cleaned_df = clean_capital_name(df, "location_name")
+    cleaned_df = clean_capital_name(df, "location_name")\
+        .filter(F.col("location_name").isNotNull())
     return cleaned_df
     
 

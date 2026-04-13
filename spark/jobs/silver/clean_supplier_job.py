@@ -1,11 +1,10 @@
-import os
 import logging
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_postgresql_table, save_into_db
-from spark.common.clean_utils import clean_decimal, clean_int, clean_is_active_types, clean_capital_name, trim_lower_column, clean_address, standardize_postal_code
+from spark.common.clean_utils import clean_decimal, clean_is_active_types, clean_capital_name
 from spark.transformations.silver.suppliers import standardize_supplier_code, clean_supplier_email
 
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +14,8 @@ def clean_suppliers() -> DataFrame:
     spark = build_spark_session('clean_suppliers')
     df = read_postgresql_table(spark=spark, schema='bronze', table='suppliers')
     cleaned_df = standardize_supplier_code(df)
-    cleaned_df = clean_capital_name(cleaned_df, "contact_name")
+    cleaned_df = clean_capital_name(cleaned_df, "contact_name")\
+        .filter(F.col("contact_name").isNotNull())
     cleaned_df = cleaned_df.withColumn("supplier_name", F.trim(F.col("supplier_name")))
     cleaned_df = clean_supplier_email(cleaned_df)
     cleaned_df = clean_capital_name(cleaned_df, "country")
@@ -29,9 +29,4 @@ def clean_suppliers() -> DataFrame:
 
 
 if __name__ == "__main__":
-    spark = build_spark_session(app_name="data_loading")
-    df = read_postgresql_table(spark=spark, schema='bronze', table='suppliers')
-    df.show(5, truncate=False)
-    cleaned_df= clean_suppliers()
-    logger.info("Preview of formated suppliers.csv")
-    cleaned_df.show(5, truncate=False)
+    clean_suppliers()

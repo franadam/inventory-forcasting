@@ -3,7 +3,7 @@ import re
 from word2number import w2n
 from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
-from pyspark.sql.types import BooleanType, IntegerType, FloatType
+from pyspark.sql.types import BooleanType, IntegerType, DecimalType
 from pyspark.sql.functions import udf
 
 def trim_lower_column(df:DataFrame, column:str) -> DataFrame:
@@ -49,11 +49,8 @@ def clean_region(df:DataFrame) -> DataFrame:
     return cleaned_df
 
 def clean_address(df:DataFrame) -> DataFrame:
-    cleaned_df = clean_capital_name(df, 'address')
-    return cleaned_df
-
-def clean_address(df:DataFrame) -> DataFrame:
-    cleaned_df = clean_capital_name(df, "address")
+    cleaned_df = clean_capital_name(df, 'address')\
+        .filter(F.col('address').isNotNull())
     return cleaned_df
 
 def clean_region(df:DataFrame) -> DataFrame:
@@ -79,12 +76,18 @@ def remove_na(df: DataFrame, column: str) -> DataFrame:
 def clean_decimal(df: DataFrame, column: str) -> DataFrame:
     cleaned_df = remove_na(df, column) \
         .withColumn(column, F.regexp_replace(F.col(column), ",", ".")) \
-        .withColumn(column, F.col(column).cast(FloatType()))
+        .withColumn(column, F.col(column).cast(DecimalType(15, 2)))
     return cleaned_df
 
 def clean_cost(df: DataFrame, column: str) -> DataFrame:
     cleaned_df = clean_decimal(df, column)\
         .where(F.col(column) > 0)
+    return cleaned_df    
+
+def clean_stock(df:DataFrame, column:str, threshold:int=50) -> DataFrame:
+    cleaned_df = clean_decimal(df, column)\
+        .withColumn(column, F.ifnull(F.col(column), F.lit(threshold)))\
+        .where(F.col(column) > -1)
     return cleaned_df
 
 def convert_word_number(word):

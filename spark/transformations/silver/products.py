@@ -1,13 +1,12 @@
 import os
-from pyspark.sql import functions as F
-from pyspark.sql import DataFrame, Column
-from pyspark.sql.types import FloatType
 import logging
+from pyspark.sql import functions as F
+from pyspark.sql import DataFrame
 
 from spark.common.config import BRONZE_PATH
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_csv
-from spark.common.clean_utils import trim_lower_column, clean_decimal, clean_int, clean_capital_name
+from spark.common.clean_utils import clean_decimal, clean_int, clean_capital_name
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

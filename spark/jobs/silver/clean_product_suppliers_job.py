@@ -1,11 +1,10 @@
-import os
 import logging
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_postgresql_table, save_into_db
-from spark.common.clean_utils import clean_cost, clean_lead_time_days, clean_ids, clean_int, standardize_date, clean_is_active_types, clean_capital_name, trim_lower_column, clean_address, standardize_postal_code
+from spark.common.clean_utils import clean_cost, clean_lead_time_days, clean_ids, clean_is_active_types
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

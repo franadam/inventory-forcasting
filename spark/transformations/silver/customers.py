@@ -6,7 +6,7 @@ import logging
 from spark.common.config import BRONZE_PATH
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_csv
-from spark.common.clean_utils import trim_lower_column, clean_boolean_types, standardize_postal_code, clean_capital_name
+from spark.common.clean_utils import trim_lower_column, clean_boolean_types, clean_capital_name
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,16 +23,13 @@ def standardize_customer_code(df:DataFrame) -> DataFrame:
     return cleaned_df
 
 def clean_customer_name(df:DataFrame) -> DataFrame:
-    cleaned_df = clean_capital_name(df, 'customer_name')
+    cleaned_df = clean_capital_name(df, 'customer_name')\
+        .filter(F.col('customer_name').isNotNull())
     return cleaned_df
 
 def clean_customer_type(df:DataFrame) -> DataFrame:
-    cleaned_df = trim_lower_column(df, 'customer_type')
-    return cleaned_df
-
-def clean_is_professional_types(df:DataFrame) -> DataFrame:
-    cleaned_df = trim_lower_column(df, 'is_professional')
-    cleaned_df = clean_boolean_types(cleaned_df, column='is_professional')
+    cleaned_df = trim_lower_column(df, 'customer_type')\
+        .withColumn('customer_type', F.ifnull(F.col('customer_type'), F.lit("private")))
     return cleaned_df
 
 if __name__ == "__main__":

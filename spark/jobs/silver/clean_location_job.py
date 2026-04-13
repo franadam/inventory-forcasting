@@ -1,6 +1,5 @@
-import os
 import logging
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
 from spark.common.data_loading import read_postgresql_table, save_into_db
@@ -27,11 +26,4 @@ def clean_locations() -> DataFrame:
     return cleaned_df
 
 if __name__ == "__main__":
-    #spark = build_spark_session('clean_locations')
-    #df = read_postgresql_table(spark=spark, schema='bronze', table='locations')
-    #logger.info("Preview of locations.csv")
-    #df.show(5, truncate=False)
-    #cleaned_df= clean_locations()
-    #logger.info("Preview of formated locations.csv")
-    #cleaned_df.show(5, truncate=False)
     clean_locations()

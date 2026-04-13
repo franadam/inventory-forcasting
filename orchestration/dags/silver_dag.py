@@ -8,7 +8,7 @@ from spark.common.spark_config import SPARK_CONN_ID
 with DAG(
     dag_id="silver_dag",
     default_args=DEFAULT_AIRFLOW_ARGS,
-    description="DAG to clean customer raw data and save it into database",
+    description="DAG to clean raw data and save it into database",
     schedule="0 14 * * *",
     catchup=False,
     tags=["silver", "clean", "spark"],
