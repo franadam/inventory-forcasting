@@ -30,6 +30,14 @@ with DAG(
         name="build_dim_customer",
         verbose=True
     )
+
+    build_dim_product_task =  SparkSubmitOperator(
+        task_id="build_dim_product",
+        conn_id=SPARK_CONN_ID,
+        application="/opt/project/spark/jobs/gold/build_dim_product_job.py",
+        name="build_dim_product",
+        verbose=True
+    )    
     
     # Define dependencies
-    [build_dim_location_task >> build_dim_customer_task]
+    [build_dim_location_task >> build_dim_customer_task >> build_dim_product_task]
