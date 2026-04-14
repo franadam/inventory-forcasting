@@ -40,5 +40,14 @@ with DAG(
         failed_states=["failed"],
     )
 
+    trigger_gold_dag_task = TriggerDagRunOperator(
+        task_id="trigger_gold_dag",
+        trigger_dag_id="gold_dag",
+        wait_for_completion=True,
+        poke_interval=10,
+        allowed_states=["success"],
+        failed_states=["failed"],
+    )
+
     # Define dependencies
-    trigger_schemas_dag_task >> trigger_bronze_dag_task >> trigger_silver_dag_task
+    trigger_schemas_dag_task >> trigger_bronze_dag_task >> trigger_silver_dag_task >> trigger_gold_dag_task
