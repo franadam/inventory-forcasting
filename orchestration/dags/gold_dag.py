@@ -11,7 +11,7 @@ with DAG(
     description="DAG to build the star schema and save it into database",
     schedule="0 14 * * *",
     catchup=False,
-    tags=["gold", "star", "model", "spark"],
+    tags=["gold", "star", "modelling", "spark"],
 ) as dag_gold:
     
     # Define tasks
@@ -22,6 +22,14 @@ with DAG(
         name="build_dim_location",
         verbose=True
     )
+
+    build_dim_customer_task =  SparkSubmitOperator(
+        task_id="build_dim_customer",
+        conn_id=SPARK_CONN_ID,
+        application="/opt/project/spark/jobs/gold/build_dim_customer_job.py",
+        name="build_dim_customer",
+        verbose=True
+    )
     
     # Define dependencies
-    build_dim_location_task 
+    [build_dim_location_task >> build_dim_customer_task]
