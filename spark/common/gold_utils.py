@@ -1,5 +1,5 @@
 from itertools import chain
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, Window, Column
 from pyspark.sql import functions as F
 
 EN_PROVINCE_TO_REGION = {
@@ -89,3 +89,8 @@ def enrich_location_geography(df: DataFrame, province_region_map: F.Column) -> D
         .withColumnRenamed("region", "province") \
         .withColumn("region", province_region_map[F.col("province")])
     return enrich_df
+
+
+def generate_code_helper(group: Column, group_id: Column):
+    group_code = F.upper(F.substring(group, 0, 3))
+    return F.concat_ws("-", group_code, group_id)
