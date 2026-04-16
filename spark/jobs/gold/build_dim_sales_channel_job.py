@@ -19,7 +19,7 @@ def build_dim_sales_channel() -> DataFrame:
         .transform(add_dim_sales_channel_surrogate_key)\
         .transform(reorder_dim_sales_channel_columns)
 
-    save_into_db(schema='gold', table='dim_sales_channels',
+    save_into_db(schema='gold', table='dim_sales_channel',
                  dataframe=dim_sales_channel_df)
 
     return dim_sales_channel_df
