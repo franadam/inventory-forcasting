@@ -4,15 +4,16 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
 from spark.common.data_loading import read_postgresql_table
-from spark.common.gold_utils import reorder_columns, add_surrogate_key
+from spark.common.gold_utils import enrich_location_geography, build_province_region_map, reorder_columns, add_surrogate_key
 
 
 def prepare_internal_customers(spark: SparkSession) -> DataFrame:
+    province_region_map = build_province_region_map()
     silver_customer_df = read_postgresql_table(
         spark=spark, schema="silver", table="customers")
-    customer_df = silver_customer_df \
-        .select("customer_code", "customer_type", "customer_name", "is_professional", "is_active")\
-        .withColumnRenamed("customer_code", "BK_dim_customer")\
+    customer_df = enrich_location_geography(silver_customer_df, province_region_map)\
+        .select("customer_id", "customer_code", "customer_type", "customer_name", "is_professional", "is_active", "address", "city", "postal_code", "province", "region")\
+        .withColumnRenamed("customer_id", "customer_id_source")\
         .withColumn("customer_status",
                     F.when(F.col("is_active") == F.lit(True), F.lit("active"))
                     .otherwise(F.lit("inactive")))\
@@ -25,14 +26,14 @@ def prepare_internal_customers(spark: SparkSession) -> DataFrame:
 
 
 def add_dim_customer_surrogate_key(df: DataFrame) -> DataFrame:
-    order_by_list = ["BK_dim_customer", "customer_name"]
+    order_by_list = ["customer_id_source", "customer_name"]
     cleaned_df = add_surrogate_key(
-        df=df, surrogate_key="PK_dim_customer", ordered_list=order_by_list)
+        df=df, surrogate_key="SK_dim_customer", ordered_list=order_by_list)
     return cleaned_df
 
 
 def reorder_dim_customer_columns(df: DataFrame) -> DataFrame:
-    ordered_list = ["PK_dim_customer", "BK_dim_customer", "customer_name",                    
-                    "customer_type", "customer_status", "customer_segment"]
+    ordered_list = ["SK_dim_customer", "customer_id_source", "customer_code", "customer_name",
+                    "customer_type", "customer_status", "customer_segment", "address", "city", "postal_code", "province", "region"]
     ordered_df = reorder_columns(df=df, ordered_list=ordered_list)
     return ordered_df
