@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
-from spark.common.data_loading import read_postgresql_table
+from spark.common.dataframe_utils import read_postgresql_table
 from spark.common.gold_utils import build_province_region_map, reorder_columns, add_surrogate_key, enrich_location_geography
 
 

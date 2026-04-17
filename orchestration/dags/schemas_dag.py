@@ -11,10 +11,11 @@ with DAG(
     description="DAG to create all the schemas",
     schedule="0 14 * * *",
     catchup=False,
-    template_searchpath=[SQL_ROOT], #add the path to the dag search path -> allow us to use sql file
+    # add the path to the dag search path -> allow us to use sql file
+    template_searchpath=[SQL_ROOT],
     tags=["bronze", "staging", "silver", "gold", "schema", "postgresql"],
 ) as dag_schemas:
-    
+
     # Define tasks
     create_bronze_schema_task = SQLExecuteQueryOperator(
         task_id="create_bronze_schema_query",
@@ -22,14 +23,14 @@ with DAG(
         split_statements=False,
         return_last=False,
     )
-    
+
     create_bronze_tables_task = SQLExecuteQueryOperator(
         task_id="create_bronze_tables_query",
         sql=f"/tables/bronze_tables.sql",
         split_statements=True,
         return_last=False,
     )
-    
+
     create_staging_schema_task = SQLExecuteQueryOperator(
         task_id="create_staging_schema_query",
         sql=f"CREATE SCHEMA IF NOT EXISTS staging;",

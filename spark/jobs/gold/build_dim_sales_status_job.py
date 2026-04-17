@@ -3,7 +3,7 @@ import logging
 from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
-from spark.common.data_loading import save_into_db
+from spark.common.dataframe_utils import save_into_db
 from spark.transformations.gold.dim_sales_status import add_dim_sales_status_surrogate_key, prepare_internal_sales_status, reorder_dim_sales_status_columns
 
 logging.basicConfig(level=logging.INFO)

@@ -1,13 +1,15 @@
 import logging
+
 from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
-from spark.common.data_loading import read_postgresql_table, save_into_db
+from spark.common.dataframe_utils import read_postgresql_table, save_into_db
 from spark.common.clean_utils import standardize_datetime, clean_is_active_types, clean_capital_name, trim_lower_column
-from spark.transformations.silver.products import clean_product_name, clean_unit_weight_kg, clean_unit_price_eur,clean_min_order_qty, clean_lead_time_days, standardize_product_code, clean_subcategory
+from spark.transformations.silver.products import clean_product_name, clean_unit_weight_kg, clean_unit_price_eur, clean_min_order_qty, clean_lead_time_days, standardize_product_code, clean_subcategory
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def clean_products() -> DataFrame:
     spark = build_spark_session('clean_products')
@@ -25,11 +27,11 @@ def clean_products() -> DataFrame:
     cleaned_df = clean_is_active_types(cleaned_df)
     cleaned_df = standardize_datetime(cleaned_df, "created_at")
     cleaned_df = standardize_datetime(cleaned_df, "updated_at")
-    
-    #save_into_db(schema='silver', table='products', dataframe=cleaned_df, mode='append')
+
+    # save_into_db(schema='silver', table='products', dataframe=cleaned_df, mode='append')
     save_into_db(schema='staging', table='products', dataframe=cleaned_df)
     return cleaned_df
 
+
 if __name__ == "__main__":
     clean_products()
-    

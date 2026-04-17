@@ -1,9 +1,10 @@
 from datetime import date
+
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
 from spark.common.spark_session import build_spark_session
-from spark.common.data_loading import save_into_db
+from spark.common.dataframe_utils import save_into_db
 
 
 def build_date_dimension(
