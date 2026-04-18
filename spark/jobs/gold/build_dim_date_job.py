@@ -9,7 +9,7 @@ from spark.common.dataframe_utils import save_into_db
 
 def build_date_dimension(
     spark: SparkSession,
-    start_date: str = "2025-01-01",
+    start_date: str = "2023-01-01",
     end_date: str = "2030-12-31",
 ) -> DataFrame:
 
