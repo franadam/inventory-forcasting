@@ -2,7 +2,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
 from spark.common.dataframe_utils import read_postgresql_table
-from spark.common.gold_utils import build_province_region_map, reorder_columns, add_surrogate_key, enrich_location_geography
+from spark.common.gold_utils import build_province_region_map, reorder_columns, enrich_location_geography
 
 
 def prepare_internal_locations(spark: SparkSession) -> DataFrame:
@@ -19,16 +19,8 @@ def prepare_internal_locations(spark: SparkSession) -> DataFrame:
     return location_df
 
 
-def add_dim_location_surrogate_key(df: DataFrame) -> DataFrame:
-    order_by_list = ["city", "postal_code",
-                     "address", "location_type", "province"]
-    cleaned_df = add_surrogate_key(
-        df=df, surrogate_key="SK_dim_location", ordered_list=order_by_list)
-    return cleaned_df
-
-
 def reorder_dim_location_columns(df: DataFrame) -> DataFrame:
-    ordered_list = ["SK_dim_location", "location_id_source", "location_type", "location_status", "storage_capacity_m3",
+    ordered_list = ["location_id_source", "location_type", "location_status", "storage_capacity_m3",
                     "address", "city", "postal_code", "province", "region"]
     ordered_df = reorder_columns(df=df, ordered_list=ordered_list)
     return ordered_df

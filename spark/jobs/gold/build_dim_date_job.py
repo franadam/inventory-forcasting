@@ -46,7 +46,7 @@ def build_date_dimension(
         )
     )
     save_into_db(schema='gold', table='dim_date',
-                 dataframe=dim_date)
+                 dataframe=dim_date, mode="append")
 
     return dim_date
 

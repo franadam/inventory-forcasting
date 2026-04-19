@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
 from spark.common.dataframe_utils import save_into_db
-from spark.transformations.gold.dim_location import reorder_dim_location_columns, add_dim_location_surrogate_key, prepare_internal_locations
+from spark.transformations.gold.dim_location import reorder_dim_location_columns, prepare_internal_locations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,11 +16,10 @@ def build_dim_location() -> DataFrame:
     locations_df = prepare_internal_locations(spark)
 
     dim_location_df = locations_df\
-        .transform(add_dim_location_surrogate_key)\
         .transform(reorder_dim_location_columns)
 
     save_into_db(schema='gold', table='dim_location',
-                 dataframe=dim_location_df)
+                 dataframe=dim_location_df, mode="append")
 
     return dim_location_df
 

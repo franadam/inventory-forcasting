@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
 from spark.common.dataframe_utils import save_into_db
-from spark.transformations.gold.dim_customer import add_dim_customer_surrogate_key, prepare_internal_customers, reorder_dim_customer_columns
+from spark.transformations.gold.dim_customer import prepare_internal_customers, reorder_dim_customer_columns
 
 
 logging.basicConfig(level=logging.INFO)
@@ -17,11 +17,10 @@ def build_dim_customer() -> DataFrame:
     customer_df = prepare_internal_customers(spark)
 
     dim_customer_df = customer_df\
-        .transform(add_dim_customer_surrogate_key)\
         .transform(reorder_dim_customer_columns)
 
     save_into_db(schema='gold', table='dim_customer',
-                 dataframe=dim_customer_df)
+                 dataframe=dim_customer_df, mode="append")
 
     return dim_customer_df
 

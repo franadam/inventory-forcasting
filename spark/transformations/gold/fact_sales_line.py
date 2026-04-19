@@ -113,15 +113,8 @@ def prepare_fact_sales_line(spark: SparkSession) -> DataFrame:
     return fact_df
 
 
-def add_fact_sales_surrogate_key(df: DataFrame) -> DataFrame:
-    order_by_list = ["sales_order_id_dd", "sales_order_line_id_dd"]
-    cleaned_df = add_surrogate_key(
-        df=df, surrogate_key="SK_fact_sales_line", ordered_list=order_by_list)
-    return cleaned_df
-
-
 def reorder_fact_sales_columns(df: DataFrame) -> DataFrame:
-    ordered_list = ["SK_fact_sales_line", "date_key", "SK_dim_product", "SK_dim_location", "SK_dim_customer", "SK_dim_sales_channel",
+    ordered_list = ["date_key", "SK_dim_product", "SK_dim_location", "SK_dim_customer", "SK_dim_sales_channel",
                     "SK_dim_sales_status", "sales_order_line_id_dd", "sales_order_id_dd", "qty_ordered", "qty_fulfilled", "unit_price_eur", "line_sales_amount_eur"]
     ordered_df = reorder_columns(df=df, ordered_list=ordered_list)
     return ordered_df

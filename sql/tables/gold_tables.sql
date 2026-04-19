@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS gold.dim_location (
     location_code VARCHAR(50) NOT NULL,
     location_name VARCHAR(100) NOT NULL,
     location_type VARCHAR(50) NOT NULL,
+    location_status VARCHAR(50) NOT NULL,
     address VARCHAR(255),
     city VARCHAR(100),
     postal_code VARCHAR(20),
@@ -74,15 +75,12 @@ CREATE TABLE IF NOT EXISTS gold.dim_date (
     day_name VARCHAR(20) NOT NULL,
     day_of_week INT NOT NULL,
     week_of_year INT NOT NULL,
+    day_of_year INT NOT NULL,
     month INT NOT NULL,
     month_name VARCHAR(20) NOT NULL,
     quarter INT NOT NULL,
     year INT NOT NULL,
     is_weekend BOOLEAN NOT NULL,
-    is_month_start BOOLEAN NOT NULL,
-    is_month_end BOOLEAN NOT NULL,
-    is_quarter_start BOOLEAN NOT NULL,
-    is_quarter_end BOOLEAN NOT NULL,
     CONSTRAINT uq_dim_date_full_date UNIQUE (full_date)
 );
 
