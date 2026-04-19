@@ -18,39 +18,46 @@ with DAG(
 
     # Define tasks
     create_bronze_schema_task = SQLExecuteQueryOperator(
-        task_id="create_bronze_schema_query",
+        task_id="create_bronze_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS bronze;",
         split_statements=False,
         return_last=False,
     )
 
     create_bronze_tables_task = SQLExecuteQueryOperator(
-        task_id="create_bronze_tables_query",
+        task_id="create_bronze_tables",
         sql=f"/tables/bronze_tables.sql",
         split_statements=True,
         return_last=False,
     )
 
     create_staging_schema_task = SQLExecuteQueryOperator(
-        task_id="create_staging_schema_query",
+        task_id="create_staging_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS staging;",
         split_statements=False,
         return_last=False,
     )
 
     create_silver_schema_task = SQLExecuteQueryOperator(
-        task_id="create_silver_schema_query",
+        task_id="create_silver_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS silver;",
         split_statements=False,
         return_last=False,
     )
 
     create_gold_schema_task = SQLExecuteQueryOperator(
-        task_id="create_gold_schema_query",
+        task_id="create_gold_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS gold;",
         split_statements=False,
         return_last=False,
     )
 
+    create_gold_tables_task = SQLExecuteQueryOperator(
+        task_id="create_gold_tables",
+        sql=f"/tables/gold_tables.sql",
+        split_statements=True,
+        return_last=False,
+    )
+
     # Define dependencies
-    create_bronze_schema_task >> create_bronze_tables_task >> create_staging_schema_task >> create_silver_schema_task >> create_gold_schema_task
+    create_bronze_schema_task >> create_bronze_tables_task >> create_staging_schema_task >> create_silver_schema_task >> create_gold_schema_task >> create_gold_tables_task
