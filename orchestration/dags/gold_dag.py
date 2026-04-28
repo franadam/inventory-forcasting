@@ -79,7 +79,16 @@ with DAG(
         verbose=True
     )
 
+    build_fact_sales_line_task = SparkSubmitOperator(
+        task_id="build_fact_sales_line",
+        conn_id=SPARK_CONN_ID,
+        application="/opt/project/spark/jobs/gold/build_fact_sales_line_job.py",
+        name="build_fact_sales_line",
+        verbose=True
+    )
+
     # Define dependencies
     build_dim_date_task >> [build_dim_location_task >> build_dim_customer_task >> build_dim_product_task >>
                             build_dim_supplier_task >> build_dim_purchase_status_task >>
-                            build_dim_sales_channel_task >> build_dim_sales_status_task]
+                            build_dim_sales_channel_task >> build_dim_sales_status_task] >> build_fact_sales_line_task
+    

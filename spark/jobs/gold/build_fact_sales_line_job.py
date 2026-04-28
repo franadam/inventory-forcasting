@@ -24,5 +24,4 @@ def build_fact_sales_line() -> DataFrame:
 
 
 if __name__ == "__main__":
-    fact_sales_line_df = build_fact_sales_line()
-    fact_sales_line_df.show(truncate=False)
+    build_fact_sales_line()
