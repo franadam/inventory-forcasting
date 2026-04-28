@@ -21,7 +21,8 @@ def build_dim_customer() -> DataFrame:
 
     save_into_db(schema='gold', table='dim_customer',
                  dataframe=dim_customer_df, mode="append")
-
+                 
+    logger.info("Columns in customer_df: %s", customer_df.columns)
     return dim_customer_df
 
 

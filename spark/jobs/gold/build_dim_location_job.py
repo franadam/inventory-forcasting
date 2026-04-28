@@ -3,7 +3,7 @@ import logging
 from pyspark.sql import DataFrame
 
 from spark.common.spark_session import build_spark_session
-from spark.common.dataframe_utils import save_into_db
+from spark.common.dataframe_utils import save_into_db, read_postgresql_table
 from spark.transformations.gold.dim_location import reorder_dim_location_columns, prepare_internal_locations
 
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +21,7 @@ def build_dim_location() -> DataFrame:
     save_into_db(schema='gold', table='dim_location',
                  dataframe=dim_location_df, mode="append")
 
+    logger.info("Columns in locations_df: %s", locations_df.columns)
     return dim_location_df
 
 

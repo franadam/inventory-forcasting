@@ -17,6 +17,25 @@ with DAG(
 ) as dag_schemas:
 
     # Define tasks
+    drop_bronze_schema_task = SQLExecuteQueryOperator(
+        task_id="drop_bronze_schema",
+        sql=f"DROP SCHEMA IF EXISTS bronze CASCADE ;",
+        split_statements=False,
+        return_last=False,
+    )
+    drop_silver_schema_task = SQLExecuteQueryOperator(
+        task_id="drop_silver_schema",
+        sql=f"DROP SCHEMA IF EXISTS silver CASCADE ;",
+        split_statements=False,
+        return_last=False,
+    )
+    drop_gold_schema_task = SQLExecuteQueryOperator(
+        task_id="drop_gold_schema",
+        sql=f"DROP SCHEMA IF EXISTS gold CASCADE ;",
+        split_statements=False,
+        return_last=False,
+    )
+
     create_bronze_schema_task = SQLExecuteQueryOperator(
         task_id="create_bronze_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS bronze;",
@@ -45,6 +64,20 @@ with DAG(
         return_last=False,
     )
 
+    create_silver_tables_task = SQLExecuteQueryOperator(
+        task_id="create_silver_tables",
+        sql=f"/tables/silver_tables.sql",
+        split_statements=True,
+        return_last=False,
+    )
+
+    populate_silver_tables_task = SQLExecuteQueryOperator(
+        task_id="populate_silver_tables",
+        sql=f"/tables/silver_populate_tables.sql",
+        split_statements=True,
+        return_last=False,
+    )
+
     create_gold_schema_task = SQLExecuteQueryOperator(
         task_id="create_gold_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS gold;",
@@ -59,5 +92,12 @@ with DAG(
         return_last=False,
     )
 
+    truncate_gold_tables_task = SQLExecuteQueryOperator(
+        task_id="truncate_gold_tables",
+        sql=f"/tables/gold_truncate_tables.sql",
+        split_statements=True,
+        return_last=False,
+    )
+
     # Define dependencies
-    create_bronze_schema_task >> create_bronze_tables_task >> create_staging_schema_task >> create_silver_schema_task >> create_gold_schema_task >> create_gold_tables_task
+    drop_bronze_schema_task >> drop_silver_schema_task >> drop_gold_schema_task >> create_bronze_schema_task >> create_bronze_tables_task >> create_staging_schema_task >> create_silver_schema_task >> create_silver_tables_task >> populate_silver_tables_task >> create_gold_schema_task >> create_gold_tables_task >> truncate_gold_tables_task

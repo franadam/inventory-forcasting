@@ -3,6 +3,7 @@ from itertools import chain
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
+from spark.common.spark_session import build_spark_session
 from spark.common.dataframe_utils import read_postgresql_table
 from spark.common.gold_utils import enrich_location_geography, build_province_region_map, reorder_columns
 
@@ -30,3 +31,5 @@ def reorder_dim_customer_columns(df: DataFrame) -> DataFrame:
                     "customer_type", "customer_status", "customer_segment", "address", "city", "postal_code", "province", "region"]
     ordered_df = reorder_columns(df=df, ordered_list=ordered_list)
     return ordered_df
+
+

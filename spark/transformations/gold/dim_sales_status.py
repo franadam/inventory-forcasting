@@ -12,7 +12,7 @@ def prepare_internal_sales_status(spark: SparkSession) -> DataFrame:
         spark=spark, schema="silver", table="sales_orders")
     sales_status_df = silver_sales_df \
         .select("status")\
-        .withColumnRenamed("sales_order_id_source")\
+        .withColumnRenamed("status", "status_name")\
         .withColumn("status_code", F.upper(F.substring(F.col("status_name"), 0, 3)))\
         .dropDuplicates(["status_name"])
     return sales_status_df
