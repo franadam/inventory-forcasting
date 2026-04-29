@@ -51,3 +51,11 @@ def save_into_db(schema: str, table: str, dataframe: DataFrame, mode: str = "ove
         .save()
     )
     logger.info(f"Data written to {schema}.{table}")
+
+
+def show_null_columns(df: DataFrame) -> None:
+    null_columns = df.select([
+        F.sum(F.col(c).isNull().cast("int")).alias(c)
+        for c in df.columns
+    ])
+    null_columns.show()

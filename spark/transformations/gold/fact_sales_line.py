@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.types import DecimalType
 
 from spark.common.spark_session import build_spark_session
 from spark.common.dataframe_utils import read_postgresql_table
@@ -100,13 +101,13 @@ def prepare_fact_sales_line(spark: SparkSession) -> DataFrame:
             F.col("dsc.SK_dim_sales_channel").alias("SK_dim_sales_channel"),
             F.col("dss.SK_dim_sales_status").alias("SK_dim_sales_status"),
             F.col("sol.qty_ordered").cast(
-                "decimal(15,2)").alias("qty_ordered"),
+                DecimalType(15,2)).alias("qty_ordered"),
             F.col("sol.qty_fulfilled").cast(
-                "decimal(15,2)").alias("qty_fulfilled"),
+                DecimalType(15,2)).alias("qty_fulfilled"),
             F.col("sol.unit_price_eur").cast(
-                "decimal(15,2)").alias("unit_price_eur"),
+                DecimalType(15,2)).alias("unit_price_eur"),
             F.col("sol.line_total_eur").cast(
-                "decimal(15,2)").alias("line_sales_amount_eur")
+                DecimalType(15,2)).alias("line_sales_amount_eur")
         )
     )
 
@@ -138,8 +139,5 @@ def validate_fact_sales_line(df: DataFrame) -> DataFrame:
 if __name__ == "__main__":
     spark = build_spark_session(app_name="fact_sales_line")
     df = prepare_fact_sales_line(spark)
-    # df = get_foreign_keys2(spark, fact_table="sales_order_lines", dim_table="dim_customer", join_keys=[
-    #                       "customer_id", "customer_id_source"], fact_id_column="line_id")
-    df = add_fact_sales_surrogate_key(df)
     df = reorder_fact_sales_columns(df)
     df.show()
