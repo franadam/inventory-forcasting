@@ -96,8 +96,9 @@ with DAG(
     )
 
     # Define dependencies
-    build_dim_date_task >> [build_dim_location_task >> build_dim_customer_task >>
-                            build_dim_product_task >> build_dim_supplier_task >>
-                            build_dim_purchase_status_task >> build_dim_sales_channel_task >>
-                            build_dim_sales_status_task] >> \
-        build_fact_sales_line_task >> build_fact_inventory_snapshot_task
+    build_dim_date_task >> [
+        build_dim_location_task >> build_dim_customer_task >>
+        build_dim_product_task >> build_dim_supplier_task >>
+        build_dim_purchase_status_task >> build_dim_sales_channel_task >>
+        build_dim_sales_status_task
+    ] >> build_fact_sales_line_task >> build_fact_inventory_snapshot_task

@@ -158,9 +158,9 @@ CREATE TABLE IF NOT EXISTS gold.fact_purchase_line (
     sk_dim_location INT NOT NULL,
     sk_dim_supplier INT NOT NULL,
     sk_dim_purchase_status INT NOT NULL,
-    expected_delivery_date_key INT NOT NULL,
-    created_at_date_key INT NOT NULL,
-    actual_delivery_date_key INT,
+    created_date_key INT NOT NULL,
+    expected_date_key INT NOT NULL,
+    actual_date_key INT,
     purchase_order_line_id_dd INT NOT NULL,
     purchase_order_id_dd INT NOT NULL,
     qty_ordered NUMERIC(15, 2),
@@ -172,9 +172,9 @@ CREATE TABLE IF NOT EXISTS gold.fact_purchase_line (
     CONSTRAINT fk_fact_purchase_dim_location FOREIGN KEY (sk_dim_location) REFERENCES gold.dim_location (sk_dim_location),
     CONSTRAINT fk_fact_purchase_dim_supplier FOREIGN KEY (sk_dim_supplier) REFERENCES gold.dim_supplier (sk_dim_supplier),
     CONSTRAINT fk_fact_purchase_dim_purchase_status FOREIGN KEY (sk_dim_purchase_status) REFERENCES gold.dim_purchase_status (sk_dim_purchase_status),
-    CONSTRAINT fk_fact_purchase_expected_delivery_date FOREIGN KEY (expected_delivery_date_key) REFERENCES gold.dim_date (date_key),
-    CONSTRAINT fk_fact_purchase_created_at_date FOREIGN KEY (created_at_date_key) REFERENCES gold.dim_date (date_key),
-    CONSTRAINT fk_fact_purchase_actual_delivery_date FOREIGN KEY (actual_delivery_date_key) REFERENCES gold.dim_date (date_key)
+    CONSTRAINT fk_fact_purchase_expected_delivery_date FOREIGN KEY (expected_date_key) REFERENCES gold.dim_date (date_key),
+    CONSTRAINT fk_fact_purchase_created_at_date FOREIGN KEY (created_date_key) REFERENCES gold.dim_date (date_key),
+    CONSTRAINT fk_fact_purchase_actual_delivery_date FOREIGN KEY (actual_date_key) REFERENCES gold.dim_date (date_key)
 );
 
 CREATE INDEX idx_dim_customer_id_source ON gold.dim_customer(customer_id_source);
@@ -197,9 +197,9 @@ CREATE INDEX idx_fact_purchase_line_sk_dim_location ON gold.fact_purchase_line(s
 CREATE INDEX idx_fact_purchase_line_sk_dim_product ON gold.fact_purchase_line(sk_dim_product);
 CREATE INDEX idx_fact_purchase_line_sk_dim_purchase_status ON gold.fact_purchase_line(sk_dim_purchase_status);
 CREATE INDEX idx_fact_purchase_line_sk_dim_supplier ON gold.fact_purchase_line(sk_dim_supplier);
-CREATE INDEX idx_fact_purchase_line_expected_delivery_date_key ON gold.fact_purchase_line(expected_delivery_date_key);
-CREATE INDEX idx_fact_purchase_line_created_at_date_key ON gold.fact_purchase_line(created_at_date_key);
-CREATE INDEX idx_fact_purchase_line_actual_delivery_date_key ON gold.fact_purchase_line(actual_delivery_date_key);
+CREATE INDEX idx_fact_purchase_line_expected_delivery_date_key ON gold.fact_purchase_line(expected_date_key);
+CREATE INDEX idx_fact_purchase_line_created_at_date_key ON gold.fact_purchase_line(created_date_key);
+CREATE INDEX idx_fact_purchase_line_actual_delivery_date_key ON gold.fact_purchase_line(actual_date_key);
 
 CREATE INDEX idx_fact_inventory_snapshot_sk_dim_location ON gold.fact_inventory_snapshot(sk_dim_location);
 CREATE INDEX idx_fact_inventory_snapshot_sk_dim_product ON gold.fact_inventory_snapshot(sk_dim_product);
